@@ -6,7 +6,7 @@ import { getCnnFeed } from "./get-cnn-feed";
 
 const parser = new Parser();
 
-export const getFeeds = async (req: Request, res: Response) => {
+export const getFeeds = async () => {
     const feeds = [
         getCnnFeed(),
         getAntaraFeed(),
@@ -14,5 +14,5 @@ export const getFeeds = async (req: Request, res: Response) => {
 
     let x = await Promise.all<Article[]>(feeds);
 
-    res.json(x.flat());
+    return x.flat();
 }

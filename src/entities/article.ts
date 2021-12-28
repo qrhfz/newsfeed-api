@@ -1,10 +1,10 @@
 export class Article{
     constructor(
-        title:string|undefined, 
-        link:string|undefined, 
-        isoDate:Date|undefined, 
-        content:string|undefined,
-        imageUrl:string|undefined){
+        title?:string|undefined, 
+        link?:string|undefined, 
+        isoDate?:Date|undefined, 
+        content?:string|undefined,
+        imageUrl?:string|undefined){
         this.title = title?? null;
         this.link = link?? null;
         this.isoDate = isoDate ?? null;
