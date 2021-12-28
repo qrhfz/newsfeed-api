@@ -1,5 +1,5 @@
-import { Article } from "../../src/entities/article";
-import { getAntaraFeed } from "../../src/rssfeed/get-antara-feed";
+import { Article } from "../../entities/article";
+import { getAntaraFeed } from "../../rssfeed/get-antara-feed";
 
 
 it("return list of antara articles",async ()=>{
