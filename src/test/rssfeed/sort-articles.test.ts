@@ -1,5 +1,5 @@
 import { Article } from "../../entities/article";
-import { convertToSeconds, sortArticle } from "../../rssfeed/sort-articles";
+import { convertToSeconds, sortArticle } from "../../common/sort-articles";
 
 const articles = [
     new Article("article 1", "google.com",new Date(1998, 18, 11)),

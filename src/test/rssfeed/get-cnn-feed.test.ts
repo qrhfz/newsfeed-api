@@ -1,5 +1,5 @@
 import { Article } from "../../entities/article";
-import { getCnnFeed } from "../../rssfeed/get-cnn-feed"
+import { getCnnFeed } from "../../cnn/get-cnn-feed"
 
 it("return list of articles",async ()=>{
     const data = await getCnnFeed();

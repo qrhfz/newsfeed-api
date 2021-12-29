@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from 'express' 
-import { rssFeed } from './rssfeed';
+import { rssFeed } from './portal';
+import { readFeedCache } from './portal/articles-cache';
 
 const app : Application = express();
 const port : number = 3000;
@@ -14,7 +15,8 @@ app.get('/', (req: Request, res: Response,)=>{
 });
 
 try {
-    app.listen(port, (): void => {
+    app.listen(port, async () => {
+        await readFeedCache();
         console.log(`Connected successfully on port ${port}`);
     });
 } catch (error: any) {

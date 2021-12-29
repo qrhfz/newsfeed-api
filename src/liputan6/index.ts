@@ -79,6 +79,6 @@ export async function callLiputan6(
     return filteredArticle
 }
 
-export const call = async ()=>{
+export default async ()=>{
     return await callLiputan6(getLiputan6FrontPage,fetchHtmlPage)
 }

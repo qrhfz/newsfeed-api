@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { Article } from '../entities/article';
 import { readFeedCache } from './articles-cache';
-import { getFeeds } from './get-feeds';
+import { getAllFeeds } from './get-all-feeds';
 import { sortArticle } from './sort-articles';
 
 const router = Router();

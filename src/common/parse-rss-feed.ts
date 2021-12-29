@@ -4,7 +4,7 @@ import { Article } from "../entities/article";
 const parser = new Parser();
 
 
-export async function getRssFeed(url:string){
+export async function parseRssFeed(url:string){
     const feed = await parser.parseURL(url);
     let articles: Article[] = []
 

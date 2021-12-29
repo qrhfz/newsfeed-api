@@ -1,5 +1,5 @@
 import { Article } from "../entities/article";
-import { getFeeds } from "./get-feeds";
+import { getAllFeeds } from "./get-all-feeds";
 
 interface ArticleCache{
     createdAt: number,
@@ -10,7 +10,7 @@ let cache: ArticleCache|undefined;
 
 export async function readFeedCache(): Promise<Article[]> {
     if(!cache){
-        const data: Article[] = await getFeeds();
+        const data: Article[] = await getAllFeeds();
         cache = {
             createdAt: Date.now(),
             articles: data
@@ -20,7 +20,7 @@ export async function readFeedCache(): Promise<Article[]> {
         const minutesDiff= Math.floor(diff/1000/60);
 
         if(minutesDiff>14){
-            const data: Article[] = await getFeeds();
+            const data: Article[] = await getAllFeeds();
             cache = {
                 createdAt: Date.now(),
                 articles: data
