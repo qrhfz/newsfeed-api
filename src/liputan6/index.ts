@@ -1,11 +1,7 @@
-import axios, { AxiosResponse } from "axios";
-
-import { JSDOM, VirtualConsole } from "jsdom";
+import axios from "axios";
 import { Article } from "../entities/article";
 import * as cheerio  from "cheerio"
 
-const virtualConsole = new VirtualConsole();
-const { getMetadata } = require('page-metadata-parser');
 
 
 const frontPage: string = 'https://www.liputan6.com/'
@@ -16,8 +12,9 @@ export async function fetchHtmlPage(url: string): Promise<string|null>{
         const { data } = await axios.get(url, {
             headers: headers
         });
-        return JSON.stringify(data);
-    } catch (_) {
+        return data
+    } catch (e) {
+        console.error(e)
         return null;
     }
 }
@@ -31,24 +28,26 @@ export async function getLiputan6FrontPage(): Promise<string> {
     }
 }
 
-export function searchNewsLinks(html: string): string[] {
-    // /https:\/\/www\.liputan6\.com\/.*\/read\/.*/.test(url)
+export function searchNewsUrls(html: string): string[] {
     const $ = cheerio.load(html)
-    const links: string[] = []
+    const urls: string[] = []
     $('a').each((index, value)=>{
-        const url = $(value).attr('href')
+        const url = $(value).attr('href')?.valueOf()
         if(!url) return;
 
         const test = /https:\/\/www\.liputan6\.com\/.*\/read\/.*/.test(url)
         if(test){
-            links.push(url)
+            urls.push(url)
         }
     })
-    return links;
+    const uniqueUrls = urls.filter((value, index, self) =>{
+        return self.indexOf(value) === index;
+      })
+    return uniqueUrls;
 
 }
 
-export function extractMetadata(html: string): Article | undefined{
+export function extractMetadata(html: string): Article{
     const $ = cheerio.load(html);
     const url = $('meta[property="og:url"]').attr('content');
     const title = $('meta[property="og:title"]').attr('content');
@@ -57,4 +56,29 @@ export function extractMetadata(html: string): Article | undefined{
     const dateString = $('meta[property="article:published_time"]').attr('content');
     const date: Date|undefined = (dateString)?new Date(dateString):undefined
     return new Article(title,url,date,description,image)
+}
+
+export async function callLiputan6(
+    callFrontPage: ()=>Promise<string>,
+    fetchHtmlPage : (url: string)=> Promise<string | null>
+    ): Promise<Article[]>{
+    const fpHtml = await callFrontPage()
+    const newsUrls = searchNewsUrls(fpHtml)
+    
+
+    const articles = await Promise.all(
+        newsUrls.map(async url=>{
+            const newsHtml = await fetchHtmlPage(url)
+            if(!newsHtml) return null
+            const article = extractMetadata(newsHtml)
+            return article
+        })
+    )
+
+    const filteredArticle = articles.filter((val):val is Article=>!!val)
+    return filteredArticle
+}
+
+export const call = async ()=>{
+    return await callLiputan6(getLiputan6FrontPage,fetchHtmlPage)
 }
