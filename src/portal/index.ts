@@ -1,15 +1,26 @@
-import { Router, Request, Response } from 'express'
+import { Request, Response, Router} from 'express'
 import { Article } from '../entities/article';
 import { readFeedCache } from './articles-cache';
-import { getAllFeeds } from './get-all-feeds';
-import { sortArticle } from './sort-articles';
+import { sortArticle } from '../common/sort-articles';
 
 const router = Router();
 
-router.get('/', async (req, res)=>{
-    const data: Article[] = await readFeedCache();
+router.get('/', async (req:Request, res:Response)=>{
+    let page = 1
+    let size = 50
+    if(req.query.page){
+        page = parseInt((req.query.page as string))
+    }
+
+    if(req.query.size){
+        size = parseInt((req.query.size as string))
+    }
     
-    res.json(sortArticle(data));
+    const data: Article[] = await readFeedCache();
+    const firstIndex = size*(page-1)
+    const lastIndex = firstIndex+size
+    const sliced = data.slice(firstIndex, lastIndex)
+    res.json(sliced);
 })
 
 export {

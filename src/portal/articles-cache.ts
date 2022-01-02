@@ -1,3 +1,4 @@
+import { sortArticle } from "../common/sort-articles";
 import { Article } from "../entities/article";
 import { getAllFeeds } from "./get-all-feeds";
 
@@ -27,5 +28,5 @@ export async function readFeedCache(): Promise<Article[]> {
             }
         }
     }
-    return cache.articles;
+    return sortArticle(cache.articles)
 }

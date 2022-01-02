@@ -8,7 +8,7 @@ const port : number = 3000;
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/news', rssFeed);
+app.use('/news', rssFeed);
 
 app.get('/', (req: Request, res: Response,)=>{
     res.send('hello');
