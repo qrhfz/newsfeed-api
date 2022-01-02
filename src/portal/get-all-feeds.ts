@@ -1,7 +1,7 @@
 import { Article } from "../entities/article";
 import Antara from "../antara";
 import CNN from "../cnn";
-import Liputan6 from "../liputan6"
+import {Liputan6} from "../liputan6"
 import Republika from "../republika"
 
 export const getAllFeeds = async () => {
@@ -9,7 +9,7 @@ export const getAllFeeds = async () => {
     const feeds = [
         CNN(),
         Antara(),
-        Liputan6(),
+        new Liputan6().call(),
         Republika()
     ]
 

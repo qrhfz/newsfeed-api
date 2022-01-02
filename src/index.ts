@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/news', rssFeed);
 
-app.get('/', (req: Request, res: Response,)=>{
+app.get('/', (_: Request, res: Response,)=>{
     res.send('hello');
 });
 

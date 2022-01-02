@@ -14,7 +14,7 @@ export async function parseRssFeed(url:string){
         const article: Article = 
         {   
             title, 
-            link,
+            url: link,
             isoDate: new Date(isoDate??''),
             snippet:contentSnippet,
             image: imageUrl

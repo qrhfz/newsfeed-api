@@ -1,84 +1,56 @@
-import axios from "axios";
 import { Article } from "../entities/article";
 import * as cheerio  from "cheerio"
+import { fetchHtmlPage } from "../common/fetch-html-page";
+import {WebScrape} from "./../common/web-scrape";
+import { extractMetadata } from "../common/extract-metadata";
 
-
-
-const frontPage: string = 'https://www.liputan6.com/'
-const headers = { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0' }
-
-export async function fetchHtmlPage(url: string): Promise<string|null>{
-    try {
-        const { data } = await axios.get(url, {
-            headers: headers
-        });
-        return data
-    } catch (e) {
-        console.error(e)
-        return null;
-    }
-}
-
-export async function getLiputan6FrontPage(): Promise<string> {
-    const html = await fetchHtmlPage(frontPage)
-    if(html){
-        return html;
-    }else{
-        return '';
-    }
-}
-
-export function searchNewsUrls(html: string): string[] {
-    const $ = cheerio.load(html)
-    const urls: string[] = []
-    $('a').each((index, value)=>{
-        const url = $(value).attr('href')?.valueOf()
-        if(!url) return;
-
-        const test = /https:\/\/www\.liputan6\.com\/.*\/read\/.*/.test(url)
-        if(test){
-            urls.push(url)
-        }
-    })
-    const uniqueUrls = urls.filter((value, index, self) =>{
-        return self.indexOf(value) === index;
-      })
-    return uniqueUrls;
-
-}
-
-export function extractMetadata(html: string): Article{
-    const $ = cheerio.load(html);
-    const link = $('meta[property="og:url"]').attr('content');
-    const title = $('meta[property="og:title"]').attr('content');
-    const snippet = $('meta[property="og:description"]').attr('content');
-    const imageUrl = $('meta[property="og:image"]').attr('content');
-    const dateString = $('meta[property="article:published_time"]').attr('content');
-    const isoDate: Date|undefined = (dateString)?new Date(dateString):undefined
-    return {title,link,isoDate,snippet,image: imageUrl}
-}
-
-export async function callLiputan6(
-    callFrontPage: ()=>Promise<string>,
-    fetchHtmlPage : (url: string)=> Promise<string | null>
-    ): Promise<Article[]>{
-    const fpHtml = await callFrontPage()
-    const newsUrls = searchNewsUrls(fpHtml)
+export class Liputan6 implements WebScrape{
     
+    frontPage: string = 'https://www.liputan6.com/'
 
-    const articles = await Promise.all(
-        newsUrls.map(async url=>{
-            const newsHtml = await fetchHtmlPage(url)
-            if(!newsHtml) return null
-            const article = extractMetadata(newsHtml)
-            return article
+    async fetchFrontPage(): Promise<string | null> {
+        const html = await fetchHtmlPage(this.frontPage)
+        if(html){
+            return html;
+        }else{
+            return '';
+        }
+    }
+    searchNewsUrls(html: string): string[] {
+        const $ = cheerio.load(html)
+        const urls: string[] = []
+        $('a').each((_, value)=>{
+            const url = $(value).attr('href')?.valueOf()
+            if(!url) return;
+
+            const test = /https:\/\/www\.liputan6\.com\/.*\/read\/.*/.test(url)
+            if(test){
+                urls.push(url)
+            }
         })
-    )
+        const uniqueUrls = urls.filter((value, index, self) =>{
+            return self.indexOf(value) === index;
+        })
+        return uniqueUrls;
+    }
+    async call(): Promise<Article[]> {
+        const fpHtml = await this.fetchFrontPage()
+        if(fpHtml===null) return []
 
-    const filteredArticle = articles.filter((val):val is Article=>!!val)
-    return filteredArticle
-}
+        const newsUrls = this.searchNewsUrls(fpHtml)
+        
 
-export default async ()=>{
-    return await callLiputan6(getLiputan6FrontPage,fetchHtmlPage)
+        const articles = await Promise.all(
+            newsUrls.map(async url=>{
+                const newsHtml = await fetchHtmlPage(url)
+                if(!newsHtml) return null
+                const article = extractMetadata(newsHtml)
+                return article
+            })
+        )
+
+        const filteredArticle = articles.filter((val):val is Article=>!!val)
+        return filteredArticle
+    }
+
 }
