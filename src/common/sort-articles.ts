@@ -1,6 +1,6 @@
 import { Article } from "../entities/article";
 
-export function convertToSeconds(date: Date|null): number {
+export function convertToSeconds(date: Date|undefined): number {
     return (date)?date.getTime()/1000:0;
 }
 

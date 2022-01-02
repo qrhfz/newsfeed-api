@@ -11,7 +11,14 @@ export async function parseRssFeed(url:string){
     feed.items.forEach(item=>{
         const {title, link, isoDate, contentSnippet, enclosure} = item;
         let imageUrl = enclosure?.url;
-        const article: Article = new Article(title, link, new Date(isoDate??''),contentSnippet, imageUrl);
+        const article: Article = 
+        {   
+            title, 
+            link,
+            isoDate: new Date(isoDate??''),
+            snippet:contentSnippet,
+            image: imageUrl
+        };
         articles.push(article);
     })
     return articles;

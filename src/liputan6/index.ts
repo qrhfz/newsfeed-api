@@ -49,13 +49,13 @@ export function searchNewsUrls(html: string): string[] {
 
 export function extractMetadata(html: string): Article{
     const $ = cheerio.load(html);
-    const url = $('meta[property="og:url"]').attr('content');
+    const link = $('meta[property="og:url"]').attr('content');
     const title = $('meta[property="og:title"]').attr('content');
-    const description = $('meta[property="og:description"]').attr('content');
-    const image = $('meta[property="og:image"]').attr('content');
+    const snippet = $('meta[property="og:description"]').attr('content');
+    const imageUrl = $('meta[property="og:image"]').attr('content');
     const dateString = $('meta[property="article:published_time"]').attr('content');
-    const date: Date|undefined = (dateString)?new Date(dateString):undefined
-    return new Article(title,url,date,description,image)
+    const isoDate: Date|undefined = (dateString)?new Date(dateString):undefined
+    return {title,link,isoDate,snippet,image: imageUrl}
 }
 
 export async function callLiputan6(
